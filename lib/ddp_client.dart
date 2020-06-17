@@ -41,7 +41,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   String _session;
   String _version;
   String _serverId;
-  WebSocket _ws;
+  WebSocketChannel _ws;
   String _url;
   String _origin;
 
@@ -129,36 +129,39 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this._statusListeners.forEach((l) => l(status));
   }
 
-  void connect() {
-    this._status(ConnectStatus.dialing);
-    WebSocket.connect(this._url).then((connection) {
-      final ws = connection;
+  void connect() async {
+    try {
+      this._status(ConnectStatus.dialing);
+      final ws = await WebSocketChannel.connect(Uri.parse(this._url));
       this._start(ws, Message.connect());
-    }).catchError((error) {
+    } catch (error) {
+      print('DDP ERROR (on connect): $error');
       this.close();
       this._reconnectLater();
-    });
+    }
   }
 
-  void reconnect() {
-    if (this._reconnectTimer != null) {
-      this._reconnectTimer.cancel();
-      this._reconnectTimer = null;
-    }
+  void reconnect() async {
+    try {
+      if (this._reconnectTimer != null) {
+        this._reconnectTimer.cancel();
+        this._reconnectTimer = null;
+      }
 
-    this.close();
-    this._reconnects++;
-    this._status(ConnectStatus.dialing);
-    WebSocket.connect(this._url).then((connection) {
+      this.close();
+      this._reconnects++;
+      this._status(ConnectStatus.dialing);
+      final connection = await WebSocketChannel.connect(Uri.parse(this._url));
       this._start(connection, Message.reconnect(this._session));
       this._calls.values.forEach((call) => this.send(
           Message.method(call.id, call.serviceMethod, call.args).toJson()));
       this._subs.values.forEach((call) => this
           .send(Message.sub(call.id, call.serviceMethod, call.args).toJson()));
-    }).catchError((error) {
+    } catch (error) {
+      print('DDP ERROR (on reconnect): $error');
       this.close();
       this._reconnectLater();
-    });
+    }
   }
 
   Call subscribe(String subName, OnCallDone done, List<dynamic> args) {
@@ -243,7 +246,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     }
 
     if (this._ws != null) {
-      this._ws.close(WebSocketStatus.normalClosure);
+      this._ws.closeCode;
       this._ws = null;
     }
 
@@ -298,16 +301,16 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     return stats;
   }
 
-  void _start(WebSocket ws, _Connect connect) {
+  void _start(WebSocketChannel ws, _Connect connect) {
     this._status(ConnectStatus.connecting);
 
     this._initMessageHandlers();
     this._ws = ws;
 
-    this._writeLog.setWriter(ws);
+    this._writeLog.setWriter(ws.sink);
     this._writeSocketStats = WriterStats(this._writeLog);
-    this._writeStats.setWriter(this._writeSocketStats);
-    this._readLog.setReader(ws);
+    //this._writeStats.setWriter(this._writeSocketStats);
+    this._readLog.setReader(ws.stream);
     this._readSocketStats = ReaderStats(this._readLog);
     this._readStats.setReader(this._readSocketStats);
 
