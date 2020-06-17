@@ -44,7 +44,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   IOWebSocketChannel _ws;
   String _url;
   String _origin;
-  Stream serverConnection;
+  Stream _serverConnection;
 
 //  Stream _inbox;
 //  Stream _errors;
@@ -93,7 +93,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
     this._statusListeners = [];
     this._connectionListener = [];
-    this.serverConnection = null;
+    this._serverConnection = null;
 
     this._reconnects = 0;
     this._pingsIn = 0;
@@ -107,6 +107,8 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   String get session => _session;
 
   String get version => _version;
+
+  Stream get serverConnection => serverConnection;
 
   @override
   void addConnectionListener(ConnectionListener listener) {
@@ -308,7 +310,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
     this._initMessageHandlers();
     this._ws = ws;
-    this.serverConnection = ws.stream;
+    this._serverConnection = ws.stream;
     this._writeLog.setWriter(ws.sink);
     this._writeSocketStats = WriterStats(this._writeLog);
     this._writeStats.setWriter(ws.sink);
