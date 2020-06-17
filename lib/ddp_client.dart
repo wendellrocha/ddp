@@ -132,7 +132,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   void connect() async {
     try {
       this._status(ConnectStatus.dialing);
-      final ws = await WebSocketChannel.connect(Uri.parse(this._url));
+      final ws = await IOWebSocketChannel.connect(Uri.parse(this._url));
       this._start(ws, Message.connect());
     } catch (error) {
       print('DDP ERROR (on connect): $error');
@@ -151,7 +151,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       this.close();
       this._reconnects++;
       this._status(ConnectStatus.dialing);
-      final connection = await WebSocketChannel.connect(Uri.parse(this._url));
+      final connection = await IOWebSocketChannel.connect(Uri.parse(this._url));
       this._start(connection, Message.reconnect(this._session));
       this._calls.values.forEach((call) => this.send(
           Message.method(call.id, call.serviceMethod, call.args).toJson()));
