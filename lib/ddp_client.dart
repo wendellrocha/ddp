@@ -108,7 +108,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
   String get version => _version;
 
-  Stream get serverConnection => serverConnection;
+  Stream get serverConnection => _serverConnection;
 
   @override
   void addConnectionListener(ConnectionListener listener) {
