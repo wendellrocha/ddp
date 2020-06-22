@@ -166,7 +166,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     }
 
     final call = Call()
-      ..id = _idManager.next()
+      ..id = subName + '-' + _idManager.next()
       ..serviceMethod = subName
       ..args = args
       ..owner = this;
@@ -177,10 +177,9 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
     call.onceDone(done);
 
-    this._subs[call.serviceMethod + '-' + call.id] = call;
+    this._subs[call.id] = call;
 
-    this.send(Message.sub(call.serviceMethod + '-' + call.id, subName, args)
-        .toJson());
+    this.send(Message.sub(call.id, subName, args).toJson());
     return call;
   }
 

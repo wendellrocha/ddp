@@ -1,3 +1,6 @@
+## 1.0.4
+- Change subscribe id
+
 ## 1.0.3
 - Analysis suggestions
   
