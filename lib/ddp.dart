@@ -2,7 +2,6 @@ library ddp;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:tuple/tuple.dart';
 import 'package:web_socket_channel/io.dart';

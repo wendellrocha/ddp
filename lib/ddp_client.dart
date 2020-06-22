@@ -45,8 +45,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   String _url;
   String _origin;
 
-//  Stream _inbox;
-//  Stream _errors;
   Timer _pingTimer;
 
   Map<String, List<_PingTracker>> _pings;
@@ -72,8 +70,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this._collections = {};
     this._url = url;
     this._origin = origin;
-//    this._inbox = Stream();
-//    this.errors = Stream();
     this._pings = {};
     this._calls = {};
     this._subs = {};
@@ -397,7 +393,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
           print(runningSub);
           this._log('Subscription returned a nosub error $msg');
           runningSub.error = ArgumentError(
-              'Subscription returned a nosub error'); // TODO error type.
+              'Subscription returned a nosub error');
           runningSub.done();
           this._subs.remove(id);
         }
@@ -437,7 +433,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
         this._calls.remove(id);
         if (msg.containsKey('error')) {
           final e = msg['error'];
-          call.error = ArgumentError(json.encode(e)); // TODO Error Type
+          call.error = ArgumentError(json.encode(e));
           call.reply = e;
         } else {
           call.reply = msg['result'];
