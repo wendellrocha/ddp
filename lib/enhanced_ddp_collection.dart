@@ -1,10 +1,10 @@
 part of enhanced_ddp;
 
 typedef void UpdateListener(
-    String collection,
-    String operation,
-    String id,
-    Map<String, dynamic> doc,
+  String collection,
+  String operation,
+  String id,
+  Map<String, dynamic> doc,
 );
 
 Tuple2<String, Map<String, dynamic>> _parseUpdate(Map<String, dynamic> update) {
