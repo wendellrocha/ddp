@@ -44,7 +44,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   IOWebSocketChannel _ws;
   String _url;
   String _origin;
-  Stream _serverConnection;
 
 //  Stream _inbox;
 //  Stream _errors;
@@ -93,7 +92,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
     this._statusListeners = [];
     this._connectionListener = [];
-    this._serverConnection = null;
 
     this._reconnects = 0;
     this._pingsIn = 0;
@@ -107,8 +105,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   String get session => _session;
 
   String get version => _version;
-
-  Stream get serverConnection => _serverConnection;
 
   @override
   void addConnectionListener(ConnectionListener listener) {
@@ -179,11 +175,17 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       ..args = args
       ..owner = this;
 
+      var _call = Call();
+
     if (done == null) {
       done = (c) {};
     }
+
     call.onceDone(done);
+
     this._subs[call.id] = call;
+    var _subs = this._subs;
+    print('subs : $_subs');
 
     this.send(Message.sub(call.id, subName, args).toJson());
     return call;
@@ -310,7 +312,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
     this._initMessageHandlers();
     this._ws = ws;
-    this._serverConnection = ws.stream;
     this._writeLog.setWriter(ws.sink);
     this._writeSocketStats = WriterStats(this._writeLog);
     this._writeStats.setWriter(ws.sink);
