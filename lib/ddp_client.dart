@@ -175,19 +175,18 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       ..args = args
       ..owner = this;
 
-      var _call = Call();
-
     if (done == null) {
       done = (c) {};
     }
 
     call.onceDone(done);
 
-    this._subs[call.serviceMethod] = call;
+    this._subs[call.serviceMethod + '-' + call.id] = call;
     var _subs = this._subs;
     print('subs : $_subs');
 
-    this.send(Message.sub(call.serviceMethod, subName, args).toJson());
+    this.send(Message.sub(call.serviceMethod + '-' + call.id, subName, args)
+        .toJson());
     return call;
   }
 
