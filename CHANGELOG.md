@@ -1,6 +1,9 @@
+## 1.0.3
+- Analysis suggestions
+  
 ## 1.0.2
 - Analysis suggestions
-- 
+
 ## 1.0.1
 - Analysis suggestions
 
