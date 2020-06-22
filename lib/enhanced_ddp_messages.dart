@@ -1,4 +1,4 @@
-part of ddp;
+part of enhanced_ddp;
 
 class Message {
   String type;

@@ -1,4 +1,4 @@
-library ddp;
+library enhanced_ddp;
 
 import 'dart:async';
 import 'dart:convert';
@@ -7,10 +7,10 @@ import 'package:tuple/tuple.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-part 'ddp_client.dart';
-part 'ddp_collection.dart';
-part 'ddp_messages.dart';
-part 'ddp_stats.dart';
+part 'enhanced_ddp_client.dart';
+part 'enhanced_ddp_collection.dart';
+part 'enhanced_ddp_messages.dart';
+part 'enhanced_ddp_stats.dart';
 
 class _IdManager {
   int _next = 0;

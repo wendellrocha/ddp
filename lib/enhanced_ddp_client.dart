@@ -1,4 +1,4 @@
-part of ddp;
+part of enhanced_ddp;
 
 enum ConnectStatus {
   disconnected,
