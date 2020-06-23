@@ -318,7 +318,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   }
 
   void _listenConnection(Stream<dynamic> _stream) {
-    _stream.listen((onData) {
+    _stream.asBroadcastStream().listen((onData) {
       final data = json.decode(onData);
       print('DDP Data - $data');
     }, onDone: () {
