@@ -318,7 +318,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   }
 
   void _listenConnection(Stream<dynamic> _stream) {
-    _stream.listen((onData) {
+    _stream.asBroadcastStream().listen((onData) {
       final data = json.decode(onData);
       print('DDP Data - $data');
     }, onDone: () {
@@ -454,7 +454,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   }
 
   void inboxManager() {
-    this._readStats.listen((event) {
+    this._readStats.asBroadcastStream().listen((event) {
       final message = json.decode(event) as Map<String, dynamic>;
       if (message.containsKey('msg')) {
         final mtype = message['msg'];
