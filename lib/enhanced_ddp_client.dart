@@ -463,7 +463,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
         this._log('Server sent message without `msg` field ${message}');
       }
     }, onDone: () {
-      reconnect();
+       this._reconnectLater();
     });
   }
 
