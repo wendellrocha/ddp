@@ -306,7 +306,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this._writeLog.setWriter(ws.sink);
     this._writeSocketStats = WriterStats(this._writeLog);
     this._writeStats.setWriter(ws.sink);
-    this._readLog.setReader(ws.stream);
+    this._readLog.setReader(ws.stream.asBroadcastStream());
     this._readSocketStats = ReaderStats(this._readLog);
     this._readStats.setReader(this._readSocketStats);
 
