@@ -21,6 +21,62 @@ abstract class StatusNotifier {
   void removeStatusListener(StatusListener listener);
 }
 
+abstract class DdpReconnectListener {
+  void onReconnectBegin();
+  void onReconnectDone();
+  void onConnected();
+}
+
+class ReconnectListenersHolder implements DdpReconnectListener {
+  List<DdpReconnectListener> _listeners = [];
+
+  void addReconnectListener(DdpReconnectListener listener) {
+    if (listener == null) {
+      return;
+    }
+
+    removeReconnectListener(listener);
+    _listeners.add(listener);
+  }
+
+  void removeReconnectListener(DdpReconnectListener listener) {
+    if (listener == null) {
+      return;
+    }
+    _listeners.remove(listener);
+  }
+
+  void onReconnectBegin() {
+    _listeners.forEach((listener) {
+      try {
+        listener.onReconnectBegin();
+      } catch (exception, stacktrace) {
+        print(exception);
+      }
+    });
+  }
+
+  void onReconnectDone() {
+    _listeners.forEach((listener) {
+      try {
+        listener.onReconnectDone();
+      } catch (exception, stacktrace) {
+        print(exception);
+      }
+    });
+  }
+
+  void onConnected() {
+    _listeners.forEach((listener) {
+      try {
+        listener.onConnected();
+      } catch (exception, stacktrace) {
+        print(exception);
+      }
+    });
+  }
+}
+
 class DdpClient implements ConnectionNotifier, StatusNotifier {
   String _name;
   Duration heartbeatInterval;
@@ -63,10 +119,16 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
   Map<String, _MessageHandler> _messageHandlers;
 
+  ReconnectListenersHolder _reconnectListenersHolder =
+      ReconnectListenersHolder();
+
+  bool _waitingForConnect = false;
+
   DdpClient(this._name, String url, String origin) {
     this.heartbeatInterval = const Duration(minutes: 1);
     this.heartbeatTimeout = const Duration(seconds: 15);
     this.reconnectInterval = const Duration(seconds: 5);
+
     this._collections = {};
     this._url = url;
     this._origin = origin;
@@ -92,6 +154,14 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this._reconnects = 0;
     this._pingsIn = 0;
     this._pingsOut = 0;
+  }
+
+  void addReconnectListener(DdpReconnectListener listener) {
+    _reconnectListenersHolder.addReconnectListener(listener);
+  }
+
+  void removeReconnectListener(DdpReconnectListener listener) {
+    _reconnectListenersHolder.removeReconnectListener(listener);
   }
 
   void _log(String msg) {
@@ -127,9 +197,15 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
   void connect() async {
     try {
+      if (_waitingForConnect == false) {
+        _waitingForConnect = true;
+        _reconnectListenersHolder.onReconnectBegin();
+      }
       this._status(ConnectStatus.dialing);
       final ws = await WebSocketChannel.connect(Uri.parse(this._url));
       this._start(ws, Message.connect());
+      _waitingForConnect = false;
+      _reconnectListenersHolder.onConnected();
     } catch (error) {
       print('DDP ERROR (on connect): $error');
       this._reconnectLater();
@@ -143,6 +219,11 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
         this._reconnectTimer = null;
       }
 
+      if (_waitingForConnect == false) {
+        _waitingForConnect = true;
+        _reconnectListenersHolder.onReconnectBegin();
+      }
+
       this.close();
       this._reconnects++;
       this._status(ConnectStatus.dialing);
@@ -152,11 +233,17 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
           Message.method(call.id, call.serviceMethod, call.args).toJson()));
       this._subs.values.forEach((call) => this
           .send(Message.sub(call.id, call.serviceMethod, call.args).toJson()));
+      _waitingForConnect = false;
+      _reconnectListenersHolder.onConnected();
     } catch (error) {
       print('DDP ERROR (on reconnect): $error');
       this.close();
       this._reconnectLater();
     }
+  }
+
+  void onAuthDone() {
+    _reconnectListenersHolder.onReconnectDone();
   }
 
   Call subscribe(String subName, OnCallDone done, List<dynamic> args) {
@@ -466,11 +553,11 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   }
 
   void _onDone() {
-     this._status(ConnectStatus.disconnected);
+    this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onDone');
     this.close();
     print('Schedule reconnect due to websocket onDone');
-    this._reconnectLater();
+    this.reconnect();
   }
 
   void _onError(dynamic error) {
