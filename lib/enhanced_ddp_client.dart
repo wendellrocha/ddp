@@ -466,6 +466,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   }
 
   void _onDone() {
+     this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onDone');
     this.close();
     print('Schedule reconnect due to websocket onDone');
@@ -473,6 +474,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   }
 
   void _onError(dynamic error) {
+    this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onError');
     this.close();
     print('Schedule reconnect due to websocket onError');
