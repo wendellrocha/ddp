@@ -132,8 +132,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       this._start(ws, Message.connect());
     } catch (error) {
       print('DDP ERROR (on connect): $error');
-      this.close();
-      this._reconnectLater();
+      this.reconnect();
     }
   }
 
@@ -314,6 +313,17 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this.inboxManager();
 
     this.send(connect.toJson());
+
+    _listenConnection(ws.stream);
+  }
+
+  void _listenConnection(Stream<dynamic> _stream) {
+    _stream.listen((onData) {
+      final data = json.decode(onData);
+      print('DDP Data - $data');
+    }, onDone: () {
+      reconnect();
+    });
   }
 
   void _reconnectLater() {
