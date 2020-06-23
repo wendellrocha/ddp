@@ -306,24 +306,13 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this._writeLog.setWriter(ws.sink);
     this._writeSocketStats = WriterStats(this._writeLog);
     this._writeStats.setWriter(ws.sink);
-    this._readLog.setReader(ws.stream.asBroadcastStream());
-    this._readSocketStats = ReaderStats(this._readLog.asBroadcastStream());
-    this._readStats.setReader(this._readSocketStats.asBroadcastStream());
+    this._readLog.setReader(ws.stream);
+    this._readSocketStats = ReaderStats(this._readLog);
+    this._readStats.setReader(this._readSocketStats);
 
     this.inboxManager();
 
     this.send(connect.toJson());
-
-    _listenConnection(ws.stream.asBroadcastStream());
-  }
-
-  void _listenConnection(Stream<dynamic> _stream) {
-    _stream.asBroadcastStream().listen((onData) {
-      final data = json.decode(onData);
-      print('DDP Data - $data');
-    }, onDone: () {
-      reconnect();
-    });
   }
 
   void _reconnectLater() {
@@ -454,7 +443,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   }
 
   void inboxManager() {
-    this._readStats.asBroadcastStream().listen((event) {
+    this._readStats.listen((event) {
       final message = json.decode(event) as Map<String, dynamic>;
       if (message.containsKey('msg')) {
         final mtype = message['msg'];
@@ -473,6 +462,8 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       } else {
         this._log('Server sent message without `msg` field ${message}');
       }
+    }, onDone: () {
+      reconnect();
     });
   }
 
