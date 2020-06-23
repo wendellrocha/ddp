@@ -132,7 +132,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       this._start(ws, Message.connect());
     } catch (error) {
       print('DDP ERROR (on connect): $error');
-      this.reconnect();
+      this._reconnectLater();
     }
   }
 
@@ -462,9 +462,21 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       } else {
         this._log('Server sent message without `msg` field ${message}');
       }
-    }, onDone: () {
-       this._reconnectLater();
-    });
+    }, onDone: this._onDone, onError: this._onError, cancelOnError: true);
+  }
+
+  void _onDone() {
+    print('Disconnect due to websocket onDone');
+    this.close();
+    print('Schedule reconnect due to websocket onDone');
+    this._reconnectLater();
+  }
+
+  void _onError(dynamic error) {
+    print('Disconnect due to websocket onError');
+    this.close();
+    print('Schedule reconnect due to websocket onError');
+    this._reconnectLater();
   }
 
   Collection _collectionBy(Map<String, dynamic> msg) {
