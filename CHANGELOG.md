@@ -1,3 +1,6 @@
+## 1.0.6
+- Auto reconnect on connection lost
+
 ## 1.0.5
 - Change to WebSocketChannel
 
