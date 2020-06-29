@@ -1,3 +1,6 @@
+## 1.0.7
+- Schedule reconnect on websocket onDone
+  
 ## 1.0.6
 - Auto reconnect on connection lost
 
