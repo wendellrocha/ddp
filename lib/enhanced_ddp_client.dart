@@ -555,6 +555,8 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   void _onDone() {
     this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onDone');
+    print(
+        'Disconnected code: ${this._ws.closeCode}, reason: ${this._ws.closeReason}');
     this.close();
     print('Schedule reconnect due to websocket onDone');
     this.reconnect();
