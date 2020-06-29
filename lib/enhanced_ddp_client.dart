@@ -521,7 +521,9 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
           call.error = ArgumentError(json.encode(e));
           call.reply = e;
         } else {
-          call.reply = msg['result'];
+          if (msg != null && msg['result'] != null) {
+            call.reply = msg['result'];
+          }
         }
         call.done();
       }
