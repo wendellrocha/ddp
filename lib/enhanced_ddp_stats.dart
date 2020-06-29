@@ -14,7 +14,7 @@ class ReaderProxy extends Stream<dynamic> {
   StreamSubscription listen(
     void Function(dynamic event) onData, {
     Function onError,
-    void Function() onDone,
+    Function onDone,
     bool cancelOnError,
   }) {
     return this._reader.listen(
@@ -119,7 +119,7 @@ class ReaderLogger extends ReaderProxy with LoggerMixin {
   StreamSubscription listen(
     void Function(dynamic event) onData, {
     Function onError,
-    void Function() onDone,
+    Function onDone,
     bool cancelOnError,
   }) {
     return super.listen(
@@ -219,7 +219,7 @@ class ReaderStats extends ReaderProxy with StatsTrackerMixin {
   StreamSubscription listen(
     void Function(dynamic event) onData, {
     Function onError,
-    void Function() onDone,
+    Function onDone,
     bool cancelOnError,
   }) {
     return super.listen(

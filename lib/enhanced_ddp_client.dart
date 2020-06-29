@@ -552,9 +552,10 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     }, onDone: this._onDone, onError: this._onError, cancelOnError: true);
   }
 
-  void _onDone() {
+  void _onDone(dynamic data) {
     this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onDone');
+    print('Data: $data');
     this.close();
     print('Schedule reconnect due to websocket onDone');
     this.reconnect();
@@ -563,6 +564,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   void _onError(dynamic error) {
     this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onError');
+    print('Error: $error');
     this.close();
     print('Schedule reconnect due to websocket onError');
     this._reconnectLater();
