@@ -50,7 +50,7 @@ class ReconnectListenersHolder implements DdpReconnectListener {
     _listeners.forEach((listener) {
       try {
         listener.onReconnectBegin();
-      } catch (exception, stacktrace) {
+      } catch (exception) {
         print(exception);
       }
     });
@@ -60,7 +60,7 @@ class ReconnectListenersHolder implements DdpReconnectListener {
     _listeners.forEach((listener) {
       try {
         listener.onReconnectDone();
-      } catch (exception, stacktrace) {
+      } catch (exception) {
         print(exception);
       }
     });
@@ -70,7 +70,7 @@ class ReconnectListenersHolder implements DdpReconnectListener {
     _listeners.forEach((listener) {
       try {
         listener.onConnected();
-      } catch (exception, stacktrace) {
+      } catch (exception) {
         print(exception);
       }
     });
@@ -334,7 +334,10 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       this._ws = null;
     }
 
-    //this._collections.values.forEach((collection) => collection._reset());
+    this._collections.values.forEach((collection) => collection._reset());
+    this._collections.values.forEach((element) {
+      print('collection: ${element.toString()}');
+    });
     this._status(ConnectStatus.disconnected);
   }
 
