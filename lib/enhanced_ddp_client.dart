@@ -228,7 +228,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       this._reconnects++;
       this._status(ConnectStatus.dialing);
       final connection = await WebSocketChannel.connect(Uri.parse(this._url));
-      print('sessao: $_session');
+      print('sessao: $this._session');
       this._start(connection, Message.reconnect(this._session));
       this._calls.values.forEach((call) => this.send(
           Message.method(call.id, call.serviceMethod, call.args).toJson()));
@@ -512,6 +512,8 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
         (msg) => this._collectionBy(msg)._addedBefore(msg);
     this._messageHandlers['movedBefore'] =
         (msg) => this._collectionBy(msg)._movedBefore(msg);
+    this._messageHandlers['reset'] =
+        (msg) => this._collectionBy(msg)._removed(msg);
     this._messageHandlers['result'] = (msg) {
       if (msg.containsKey('id')) {
         final id = msg['id'];
@@ -559,7 +561,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onDone');
     print('Disconnected code: ${_ws.closeCode}, reason: ${_ws.closeReason}');
-    this.close();
     print('Schedule reconnect due to websocket onDone');
     this._reconnectLater();
   }
@@ -568,7 +569,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onError');
     print('Error: $error');
-    this.close();
     print('Schedule reconnect due to websocket onError');
     this._reconnectLater();
   }
