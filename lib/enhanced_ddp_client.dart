@@ -233,11 +233,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
           Message.method(call.id, call.serviceMethod, call.args).toJson()));
       this._subs.values.forEach((call) => this
           .send(Message.sub(call.id, call.serviceMethod, call.args).toJson()));
-      this._collections.values.forEach((collecton) {
-        collecton.listeners.forEach((listener) {
-          collecton.addUpdateListener(listener);
-        });
-      });
       _waitingForConnect = false;
       _reconnectListenersHolder.onConnected();
     } catch (error) {
@@ -410,6 +405,14 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this.inboxManager();
 
     this.send(connect.toJson());
+
+    if (this._collections.values.length > 0) {
+      this._collections.values.forEach((collecton) {
+        collecton.listeners.forEach((listener) {
+          collecton.addUpdateListener(listener);
+        });
+      });
+    }
   }
 
   void _reconnectLater() {
