@@ -339,7 +339,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       this._ws = null;
     }
 
-    this._collections.values.forEach((collection) => collection._reset());
+    //this._collections.values.forEach((collection) => collection._reset());
     // this._collections.values.forEach((collecton) {
     //   collecton.listeners.forEach((listener) {
     //     collecton.addUpdateListener(listener);
