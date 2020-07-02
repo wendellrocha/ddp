@@ -521,8 +521,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
         (msg) => this._collectionBy(msg)._addedBefore(msg);
     this._messageHandlers['movedBefore'] =
         (msg) => this._collectionBy(msg)._movedBefore(msg);
-    this._messageHandlers['reset'] =
-        (msg) => this._collectionBy(msg)._removed(msg);
     this._messageHandlers['result'] = (msg) {
       if (msg.containsKey('id')) {
         final id = msg['id'];
