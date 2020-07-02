@@ -44,6 +44,8 @@ abstract class Collection {
 
   void _reset();
 
+  List<UpdateListener> get listeners;
+
   factory Collection.mock() => _MockCache();
 
   factory Collection.key(String name) => KeyCache(name, {}, []);
@@ -60,6 +62,10 @@ class KeyCache implements Collection {
     this._listeners.forEach((listener) {
       listener(this.name, operation, id, doc);
     });
+  }
+
+  List<UpdateListener> get listeners {
+    return this._listeners;
   }
 
   @override
@@ -148,4 +154,7 @@ class _MockCache implements Collection {
 
   @override
   Map<String, dynamic> findOne(String id) => null;
+
+  @override
+  List<UpdateListener> get listeners => null;
 }
