@@ -405,14 +405,6 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this.inboxManager();
 
     this.send(connect.toJson());
-
-    if (this._collections.values.length > 0) {
-      this._collections.values.forEach((collecton) {
-        collecton.listeners.forEach((listener) {
-          collecton.addUpdateListener(listener);
-        });
-      });
-    }
   }
 
   void _reconnectLater() {
