@@ -32,6 +32,8 @@ abstract class Collection {
 
   void removeUpdateListener(UpdateListener listener);
 
+  void removeUpdateListeners();
+
   void _added(Map<String, dynamic> msg);
 
   void _changed(Map<String, dynamic> msg);
@@ -120,6 +122,11 @@ class KeyCache implements Collection {
   }
 
   @override
+  void removeUpdateListeners() {
+    this._listeners.clear();
+  }
+
+  @override
   void removeUpdateListener(UpdateListener listener) {
     this._listeners.removeWhere((element) => element == listener);
     // this._listeners.remove(value);
@@ -159,6 +166,9 @@ class _MockCache implements Collection {
 
   @override
   void removeUpdateListener(UpdateListener listener) {}
+
+  @override
+  void removeUpdateListeners() {}
 
   @override
   Map<String, Map<String, dynamic>> findAll() => {};
