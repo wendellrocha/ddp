@@ -30,6 +30,8 @@ abstract class Collection {
 
   void addUpdateListener(UpdateListener listener);
 
+  void removeUpdateListeners();
+
   void _added(Map<String, dynamic> msg);
 
   void _changed(Map<String, dynamic> msg);
@@ -64,8 +66,9 @@ class KeyCache implements Collection {
     });
   }
 
-  List<UpdateListener> get listeners {
-    return this._listeners;
+ @override 
+  void removeUpdateListeners() {
+    this._listeners.clear();
   }
 
   @override
@@ -148,6 +151,9 @@ class _MockCache implements Collection {
 
   @override
   void addUpdateListener(UpdateListener listener) {}
+
+  @override
+  void removeUpdateListeners() {}
 
   @override
   Map<String, Map<String, dynamic>> findAll() => {};
