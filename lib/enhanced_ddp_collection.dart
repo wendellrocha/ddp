@@ -111,7 +111,11 @@ class KeyCache implements Collection {
 
   @override
   void addUpdateListener(UpdateListener listener) {
-    this._listeners.removeWhere((element) => element == listener);
+    this._listeners.removeWhere((element) {
+      bool isEqual = element == listener;
+      print('listenerEqual: $isEqual');
+      return element == listener;
+    });
     this._listeners.add(listener);
   }
 
