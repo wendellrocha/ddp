@@ -30,8 +30,6 @@ abstract class Collection {
 
   void addUpdateListener(UpdateListener listener);
 
-  void removeUpdateListener(UpdateListener listener);
-
   void removeUpdateListeners();
 
   void _added(Map<String, dynamic> msg);
@@ -113,23 +111,12 @@ class KeyCache implements Collection {
 
   @override
   void addUpdateListener(UpdateListener listener) {
-    // this._listeners.removeWhere((element) {
-    //   bool isEqual = element == listener;
-    //   print('listenerEqual: $isEqual');
-    //   return element == listener;
-    // });
     this._listeners.add(listener);
   }
 
   @override
   void removeUpdateListeners() {
     this._listeners.clear();
-  }
-
-  @override
-  void removeUpdateListener(UpdateListener listener) {
-    this._listeners.removeWhere((element) => element == listener);
-    // this._listeners.remove(value);
   }
 
   @override
@@ -163,9 +150,6 @@ class _MockCache implements Collection {
 
   @override
   void addUpdateListener(UpdateListener listener) {}
-
-  @override
-  void removeUpdateListener(UpdateListener listener) {}
 
   @override
   void removeUpdateListeners() {}

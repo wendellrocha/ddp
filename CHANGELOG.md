@@ -1,4 +1,7 @@
 ## 1.0.8
+- Fixes removeUpdateListeners
+
+## 1.0.8
 - Add Collection.removeUpdateListeners
 
 ## 1.0.7
