@@ -1,4 +1,28 @@
-## 1.0.8
+## 1.0.11.dev-2
+ - Fixes
+
+## 1.0.10
+ - Stable
+
+## 1.0.10-dev.6
+ - Update
+
+## 1.0.10-dev.5
+ - Update
+
+## 1.0.10-dev.4
+ - Update
+
+## 1.0.10-dev.3
+ - Update
+  
+## 1.0.10-dev.2
+ - Update
+  
+## 1.0.10-dev.1
+ - Analisys
+
+## 1.0.9
 - Fixes removeUpdateListeners
 
 ## 1.0.8
