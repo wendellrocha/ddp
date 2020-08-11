@@ -1,7 +1,7 @@
 name: enhanced_ddp
 description: This is a DDP protocol implementation for Flutter/Dart to interact with Meteor Framework.
-version: 1.0.11
-homepage: https://github.com/wendellrocha/ddp
+version: 1.0.12
+homepage: https://github.com/wendellrocha/enhanced_ddp
 environment:
   sdk: ">=1.8.0 <3.0.0"
 

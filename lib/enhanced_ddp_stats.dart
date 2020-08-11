@@ -61,7 +61,7 @@ class WriterProxy implements StreamSink<dynamic> {
   }
 
   void setWriter(WebSocketSink writer) {
-    this._writer = writer;
+    this._writer = writer as StreamSink;
   }
 }
 

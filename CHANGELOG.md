@@ -1,3 +1,9 @@
+## 1.0.12
+ - Release
+
+## 1.0.12-dev.1
+ - Meteor Error Code
+
 ## 1.0.11
  - Release
 

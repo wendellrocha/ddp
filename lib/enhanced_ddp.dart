@@ -2,6 +2,7 @@ library enhanced_ddp;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:tuple/tuple.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -23,6 +24,7 @@ class _IdManager {
 
 class _PingTracker {
   Function(Error) _handler;
+  // ignore: unused_field
   Duration _timeout;
   Timer _timer;
 }

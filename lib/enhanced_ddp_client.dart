@@ -96,9 +96,11 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
   String _session;
   String _version;
+  // ignore: unused_field
   String _serverId;
   WebSocketChannel _ws;
   String _url;
+  // ignore: unused_field
   String _origin;
 
   Timer _pingTimer;
