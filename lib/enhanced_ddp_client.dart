@@ -127,8 +127,8 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   bool _waitingForConnect = false;
 
   DdpClient(this._name, String url, String origin) {
-    this.heartbeatInterval = const Duration(seconds: 15);
-    this.heartbeatTimeout = const Duration(seconds: 20);
+    this.heartbeatInterval = const Duration(seconds: 10);
+    this.heartbeatTimeout = const Duration(seconds: 15);
     this.reconnectInterval = const Duration(seconds: 5);
 
     this._collections = {};
