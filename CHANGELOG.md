@@ -1,3 +1,9 @@
+## 1.0.14
+ - Change heartbeat inverval
+
+## 1.0.13
+ - Release
+
 ## 1.0.12
  - Release
 
