@@ -7,10 +7,18 @@ enum ConnectStatus {
   connected,
 }
 
+enum SubscriptionStatus { ready, waiting }
+
+typedef void SubscriptionListener(String name, SubscriptionStatus status);
+
 typedef void _MessageHandler(Map<String, dynamic> message);
 
 typedef void ConnectionListener();
 typedef void StatusListener(ConnectStatus status);
+
+abstract class SubscriptionNotifier {
+  void subscriptionReady(SubscriptionListener listener);
+}
 
 abstract class ConnectionNotifier {
   void addConnectionListener(ConnectionListener listener);
@@ -77,7 +85,8 @@ class ReconnectListenersHolder implements DdpReconnectListener {
   }
 }
 
-class DdpClient implements ConnectionNotifier, StatusNotifier {
+class DdpClient
+    implements ConnectionNotifier, StatusNotifier, SubscriptionNotifier {
   String _name;
   Duration heartbeatInterval;
   Duration heartbeatTimeout;
@@ -109,6 +118,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   Map<String, Call> _calls;
   Map<String, Call> _subs;
   Map<String, Call> _unsubs;
+  List<dynamic> _subscriptions;
 
   Map<String, Collection> _collections;
   ConnectStatus _connectionStatus;
@@ -116,6 +126,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
   List<StatusListener> _statusListeners;
   List<ConnectionListener> _connectionListener;
+  List<SubscriptionListener> _subscriptionListener;
 
   _IdManager _idManager;
 
@@ -129,7 +140,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   DdpClient(this._name, String url, String origin) {
     this.heartbeatInterval = const Duration(seconds: 25);
     this.heartbeatTimeout = const Duration(seconds: 15);
-    this.reconnectInterval = const Duration(seconds: 5);
+    this.reconnectInterval = const Duration(seconds: 10);
 
     this._collections = {};
     this._url = url;
@@ -138,6 +149,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this._calls = {};
     this._subs = {};
     this._unsubs = {};
+    this._subscriptions = [];
     this._connectionStatus = ConnectStatus.disconnected;
 
     this._writeSocketStats = WriterStats(null);
@@ -152,6 +164,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
     this._statusListeners = [];
     this._connectionListener = [];
+    this._subscriptionListener = [];
 
     this._reconnects = 0;
     this._pingsIn = 0;
@@ -174,6 +187,8 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
 
   String get version => _version;
 
+  List<dynamic> get subscriptions => this._subscriptions;
+
   @override
   void addConnectionListener(ConnectionListener listener) {
     this._connectionListener.add(listener);
@@ -187,6 +202,15 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
   @override
   void removeStatusListener(StatusListener listener) {
     this._statusListeners.remove(listener);
+  }
+
+  @override
+  void subscriptionReady(SubscriptionListener listener) {
+    this._subscriptionListener.add(listener);
+  }
+
+  void notifySubscription(String name, SubscriptionStatus status) {
+    this._subscriptionListener.forEach((l) => l(name, status));
   }
 
   void _status(ConnectStatus status) {
@@ -252,6 +276,8 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     if (args == null) {
       args = [];
     }
+
+    this.notifySubscription(subName, SubscriptionStatus.waiting);
 
     final call = Call()
       ..id = subName + '-' + _idManager.next()
@@ -494,9 +520,11 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     };
     this._messageHandlers['ready'] = (msg) {
       if (msg.containsKey('subs')) {
-        final subs = msg['subs'] as List<dynamic>;
-        subs.forEach((sub) {
+        this._subscriptions = msg['subs'] as List<dynamic>;
+        _subscriptions.forEach((sub) {
           if (this._subs.containsKey(sub)) {
+            var subscription = this._subs[sub].toString().split('-')[0];
+            this.notifySubscription(subscription, SubscriptionStatus.ready);
             this._subs[sub].done();
             this._subs.remove(sub);
           }
@@ -553,7 +581,7 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
       } else {
         this._log('Server sent message without `msg` field ${message}');
       }
-    }, onDone: this._onDone, onError: this._onError, cancelOnError: true);
+    }, onDone: this._onDone, onError: this._onError, cancelOnError: false);
   }
 
   void _onDone() {
@@ -564,11 +592,12 @@ class DdpClient implements ConnectionNotifier, StatusNotifier {
     this._reconnectLater();
   }
 
-  void _onError(dynamic error) {
+  void _onError(Object error, StackTrace stackTrace) {
     this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onError');
-    print('Error: $error');
     print('Schedule reconnect due to websocket onError');
+    print('Error: $error');
+    print('StackTrace: ${stackTrace}');
     this._reconnectLater();
   }
 
