@@ -587,7 +587,9 @@ class DdpClient
   void _onDone() {
     this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onDone');
-    print('Disconnected code: ${_ws.closeCode}, reason: ${_ws.closeReason}');
+    if (this._ws != null)
+      print(
+          'Disconnected code: ${this._ws.closeCode}, reason: ${this._ws.closeReason}');
     print('Schedule reconnect due to websocket onDone');
     this._reconnectLater();
   }
