@@ -1,3 +1,6 @@
+## 1.2.2
+ - Remove stackTrace print
+
 ## 1.2.1
  - 🕵️‍♂️
 

@@ -594,12 +594,11 @@ class DdpClient
     this._reconnectLater();
   }
 
-  void _onError(Object error, StackTrace stackTrace) {
+  void _onError(Object error) {
     this._status(ConnectStatus.disconnected);
     print('Disconnect due to websocket onError');
     print('Schedule reconnect due to websocket onError');
     print('Error: $error');
-    print('StackTrace: ${stackTrace}');
     this._reconnectLater();
   }
 
