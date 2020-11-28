@@ -1,3 +1,9 @@
+## 1.2.2+2
+ - Reconnect
+
+## 1.2.2+1
+ - Reconnect
+
 ## 1.2.2
  - Remove stackTrace print
 

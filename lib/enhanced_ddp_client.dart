@@ -581,7 +581,7 @@ class DdpClient
       } else {
         this._log('Server sent message without `msg` field ${message}');
       }
-    }, onDone: this._onDone, onError: this._onError, cancelOnError: false);
+    }, onDone: this._onDone, onError: this._onError, cancelOnError: true);
   }
 
   void _onDone() {
