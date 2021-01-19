@@ -27,12 +27,9 @@ class Message {
   }
 
   Map<String, dynamic> _toMap() {
-    Map<String, dynamic> map = {};
-    if (this.id != null) {
-      map['id'] = this.id;
-    }
-    map['msg'] = this.type;
-    return map;
+    if (this.id != null) return {'id': this.id, 'msg': this.type};
+
+    return {'msg': this.type};
   }
 }
 
