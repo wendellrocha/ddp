@@ -21,13 +21,6 @@ class _IdManager {
   }
 }
 
-class _PingTracker {
-  Function(Error) _handler;
-  // ignore: unused_field
-  Duration _timeout;
-  Timer _timer;
-}
-
 typedef void OnCallDone(Call call);
 
 class Call {

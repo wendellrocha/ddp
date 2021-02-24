@@ -1,3 +1,6 @@
+## 1.2.4
+ - Fix ping-pong
+
 ## 1.2.3
  - Bug fixes
 

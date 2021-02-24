@@ -37,6 +37,7 @@ class WriterProxy implements StreamSink<dynamic> {
 
   @override
   void add(event) {
+    print('[DDP] -> $event');
     this._writer.add(event);
   }
 

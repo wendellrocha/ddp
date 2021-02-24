@@ -114,7 +114,6 @@ class DdpClient
 
   Timer _pingTimer;
 
-  Map<String, List<_PingTracker>> _pings;
   Map<String, Call> _calls;
   Map<String, Call> _subs;
   Map<String, Call> _unsubs;
@@ -137,15 +136,14 @@ class DdpClient
 
   bool _waitingForConnect = false;
 
-  DdpClient(this._name, String url, String origin) {
+  DdpClient(this._name, String url, String origin,
+      {this.reconnectInterval = const Duration(seconds: 25)}) {
     this.heartbeatInterval = const Duration(seconds: 25);
     this.heartbeatTimeout = const Duration(seconds: 15);
-    this.reconnectInterval = const Duration(seconds: 10);
 
     this._collections = {};
     this._url = url;
     this._origin = origin;
-    this._pings = {};
     this._calls = {};
     this._subs = {};
     this._unsubs = {};
@@ -437,29 +435,6 @@ class DdpClient
     }
   }
 
-  void ping() {
-    this.pingPong(this._idManager.next(), this.heartbeatTimeout, (err) {
-      if (err != null) {
-        this._reconnectLater();
-      }
-    });
-  }
-
-  void pingPong(String id, Duration timeout, Function(Error) handler) {
-    this.send(Message.ping(id).toJson());
-    this._pingsOut++;
-    if (!this._pings.containsKey(id)) {
-      this._pings[id] = [];
-    }
-    final pingTracker = _PingTracker()
-      .._handler = handler
-      .._timeout = timeout
-      .._timer = Timer(timeout, () {
-        handler(ArgumentError('ping timeout'));
-      });
-    this._pings[id].add(pingTracker);
-  }
-
   void _initMessageHandlers() {
     this._messageHandlers = {};
     this._messageHandlers['connected'] = (msg) {
@@ -467,36 +442,13 @@ class DdpClient
       this._collections.values.forEach((c) => c._init());
       this._version = '1';
       this._session = msg['session'] as String;
-      this._pingTimer = Timer.periodic(this.heartbeatInterval, (Timer timer) {
-        this.ping();
-      });
       this._connectionListener.forEach((l) => l());
     };
     this._messageHandlers['ping'] = (msg) {
-      if (msg.containsKey('id')) {
-        this.send(Message.pong(msg['id']).toJson());
-      } else {
-        this.send(Message.pong(null).toJson());
-      }
-      this._pingsIn++;
+      this.send(Message.pong(null).toJson());
     };
     this._messageHandlers['pong'] = (msg) {
-      var key = '';
-      if (msg.containsKey('id')) {
-        key = msg['id'] as String;
-      }
-      if (this._pings.containsKey(key)) {
-        final pings = this._pings[key];
-        if (pings.isNotEmpty) {
-          final ping = pings[0];
-          final newPings = pings.sublist(1);
-          if (key.isEmpty || pings.isNotEmpty) {
-            this._pings[key] = newPings;
-          }
-          ping._timer.cancel();
-          ping._handler(null);
-        }
-      }
+      this.send(Message.ping(null).toJson());
     };
     this._messageHandlers['nosub'] = (msg) {
       if (msg.containsKey('id')) {
