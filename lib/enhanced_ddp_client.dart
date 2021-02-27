@@ -88,8 +88,6 @@ class ReconnectListenersHolder implements DdpReconnectListener {
 class DdpClient
     implements ConnectionNotifier, StatusNotifier, SubscriptionNotifier {
   String _name;
-  Duration heartbeatInterval;
-  Duration heartbeatTimeout;
   Duration reconnectInterval;
 
   WriterStats _writeSocketStats;
@@ -138,9 +136,6 @@ class DdpClient
 
   DdpClient(this._name, String url, String origin,
       {this.reconnectInterval = const Duration(seconds: 25)}) {
-    this.heartbeatInterval = const Duration(seconds: 25);
-    this.heartbeatTimeout = const Duration(seconds: 15);
-
     this._collections = {};
     this._url = url;
     this._origin = origin;
